@@ -105,14 +105,16 @@ td button { padding: 4px 10px; font-size: 13px; }
     padding: 10px max(16px, env(safe-area-inset-right, 0px)) calc(10px + env(safe-area-inset-bottom, 0px)) max(16px, env(safe-area-inset-left, 0px)); }
   .mini .score { font-size: 1.6rem; }
 }
-footer { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 80ch; }
+footer.foot { border-top: 1px solid var(--line); padding-top: 16px; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 20rem), 1fr)); gap: 20px; font-size: 14px; color: var(--muted); line-height: 1.6; }
+footer.foot h3 { margin: 0 0 4px; font-size: 14px; color: var(--fg); }
+footer.foot p { margin: 0 0 8px; }
 </style>
 
 <div class="wrap">
   <header>
-    <p class="eyebrow">Research prototype &middot; MPhil thesis, KNUST</p>
+    <p class="eyebrow">MPhil thesis project &middot; KNUST &middot; Research prototype</p>
     <h1>Newborn hypothermia risk check</h1>
-    <p class="intro">Enter what is known about a newborn on arrival, before the temperature is taken. The random forest from the HopeXchange study gives a risk score and says whether the baby would cross the study's alarm threshold.</p>
+    <p class="intro">I built this from my MPhil thesis. Enter what you know about a newborn on arrival, before the temperature is taken. It gives the model's score and tells you whether the baby would have been flagged in my study.</p>
   </header>
 
   <div class="warning" role="note">
@@ -121,7 +123,7 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 80ch
 
   <div class="layout">
     <form class="card" id="form" novalidate>
-      <span class="example" id="example-tag">Example baby loaded. Replace with the baby's details.</span>
+      <span class="example" id="example-tag">This is a made-up example baby. Type over it or press Clear form.</span>
 
       <fieldset class="group">
         <legend>The baby</legend>
@@ -168,8 +170,8 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 80ch
           <div class="field">
             <span class="lab" id="mode-lab">Mode of delivery</span>
             <div class="seg" role="radiogroup" aria-labelledby="mode-lab">
-              <label><input type="radio" name="caesarean" id="cs-0" value="0"><span>Vaginal</span></label>
-              <label><input type="radio" name="caesarean" id="cs-1" value="1"><span>Caesarean</span></label>
+              <label><input type="radio" name="caesarean" id="cs-0" value="0"><span>Vaginal (SVD)</span></label>
+              <label><input type="radio" name="caesarean" id="cs-1" value="1"><span>Caesarean (CS)</span></label>
             </div>
           </div>
         </div>
@@ -227,7 +229,7 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 80ch
         <button type="button" id="clear">Clear form</button>
         <button type="button" id="load-example">Load example baby</button>
       </div>
-      <p class="small">Leave anything you do not know blank. The model then uses the value most common in the study, which makes the score less certain.</p>
+      <p class="small">If you don't know something, leave it blank. The model will use the most common value from my data instead, so the score is less reliable.</p>
     </form>
 
     <aside class="card result" id="result" aria-live="polite">
@@ -244,13 +246,13 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 80ch
       </div>
       <p class="meaning" id="meaning"></p>
       <div class="box">
-        <h3>Babies with similar scores in the study</h3>
+        <h3>Babies with similar scores in my test set</h3>
         <p id="band"></p>
       </div>
       <div class="box">
-        <h3>What moved this score most</h3>
+        <h3>What raised or lowered the score</h3>
         <ul class="drivers" id="drivers"></ul>
-        <p class="small">Change in score if that detail were the study's most common value instead.</p>
+        <p class="small">How much the score would change if that detail were the most common value in my data.</p>
       </div>
       <p class="small" id="missing-note"></p>
     </aside>
@@ -258,7 +260,7 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 80ch
 
   <section class="card list" id="list">
     <h2>Babies checked this session</h2>
-    <p class="small">Kept only on this screen and cleared when the page closes. Nothing is saved or sent. Use a bed number rather than a name.</p>
+    <p class="small">This list stays on this screen and disappears when you close the page. Nothing is saved or sent anywhere. Please use a bed number, not a name.</p>
     <div class="listbar">
       <div class="field">
         <label for="label">Bed or label</label>
@@ -275,8 +277,17 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 80ch
     <p class="empty" id="empty">No babies added yet. Score a baby above, then add them here to compare.</p>
   </section>
 
-  <footer>
-    How the score works: 400 decision trees, each grown on a resample of 480 study admissions, look at 14 details known at admission and vote; the score is the average vote. At the 0.50 threshold, on 121 admissions held back for testing, the model caught 28 of 35 hypothermic babies and also flagged 21 of 86 babies who were not hypothermic. Hypothermic babies were weighted more heavily during training, which pushes scores up. Model: Sally Gli, MPhil Biomedical Data Science, Kwame Nkrumah University of Science and Technology, using de-identified admission records from HopeXchange Medical Centre, Kumasi. Scores in this page match the Python model (scikit-learn 1.6.1) to within 0.000000001.
+  <footer class="foot">
+    <div>
+      <h3>How it works</h3>
+      <p>The model is a random forest: 400 small decision trees, each trained on a different resample of 480 admissions from my study. Each tree looks at 14 details known at admission and gives a score, and the page averages them. I tested it on 121 admissions it had not seen. At the 0.50 threshold it caught 28 of the 35 hypothermic babies, and it also flagged 21 of the 86 babies who were not hypothermic.</p>
+      <p>I gave hypothermic babies extra weight during training so the model would not ignore them. That makes the scores run higher than the real risk, which is why the page shows what happened to test babies with similar scores.</p>
+    </div>
+    <div>
+      <h3>Who made it</h3>
+      <p>Sally Gli, MPhil Biomedical Data Science, Kwame Nkrumah University of Science and Technology. Built with de-identified admission records from HopeXchange Medical Centre, Kumasi.</p>
+      <p>Version 1, October 2026.</p>
+    </div>
   </footer>
 
   <div class="mini" aria-hidden="true">
@@ -425,7 +436,9 @@ footer { font-size: 13px; color: var(--muted); line-height: 1.6; max-width: 80ch
   }
   function clearForm() {
     ['age', 'bw', 'ga-w', 'ga-d', 'apgar1', 'apgar5'].forEach((id) => { $(id).value = ''; });
-    ['male', 'born_outside', 'caesarean', 'night', 'skin_to_skin', 'arrival'].forEach((n) => setRadio(n, null));
+    ['male', 'born_outside', 'caesarean', 'night', 'skin_to_skin', 'arrival'].forEagit push -u origin main
+remote: Repository not found.
+fatal: repository 'https://github.com/sallygli/hypothermia-risk-check.git/' not foundch((n) => setRadio(n, null));
     $('apgar5-missing').checked = false; $('apgar5').disabled = false;
     $('date').value = new Date().toISOString().slice(0, 10);
     $('example-tag').hidden = true; update(); $('age').focus();

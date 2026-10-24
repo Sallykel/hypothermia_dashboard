@@ -436,9 +436,7 @@ footer.foot p { margin: 0 0 8px; }
   }
   function clearForm() {
     ['age', 'bw', 'ga-w', 'ga-d', 'apgar1', 'apgar5'].forEach((id) => { $(id).value = ''; });
-    ['male', 'born_outside', 'caesarean', 'night', 'skin_to_skin', 'arrival'].forEagit push -u origin main
-remote: Repository not found.
-fatal: repository 'https://github.com/sallygli/hypothermia-risk-check.git/' not foundch((n) => setRadio(n, null));
+    ['male', 'born_outside', 'caesarean', 'night', 'skin_to_skin', 'arrival'].forEach((n) => setRadio(n, null));
     $('apgar5-missing').checked = false; $('apgar5').disabled = false;
     $('date').value = new Date().toISOString().slice(0, 10);
     $('example-tag').hidden = true; update(); $('age').focus();
